@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guess the Number Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-lg bg-gray-800 rounded-2xl shadow-2xl p-8 transform transition-all duration-300 hover:scale-[1.01] border border-gray-700">
+        <h1 class="text-4xl font-bold text-center mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-500">
+            Guess the Number!
+        </h1>
+        <p class="text-gray-300 text-center mb-6">
+            I'm thinking of a number between 1 and 100. Can you guess it in 10 tries?
+        </p>
+
+        <div class="flex flex-col sm:flex-row gap-4 mb-6 items-center justify-center">
+            <input 
+                type="number" 
+                id="guess-input" 
+                placeholder="Enter your guess..." 
+                class="flex-grow p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200"
+                min="1" 
+                max="100"
+            >
+            <button 
+                id="submit-guess-btn" 
+                class="w-full sm:w-auto p-3 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-white font-medium transition duration-200 ease-in-out transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-800"
+            >
+                Submit Guess
+            </button>
+        </div>
+
+        <div class="text-center">
+            <p id="last-guess-text" class="text-gray-400 mb-2">Last guess: <span id="last-guess-value">None</span></p>
+            <p id="guesses-remaining" class="text-gray-400 mb-2">Guesses remaining: <span id="guesses-remaining-value">10</span></p>
+            <p id="message-display" class="font-semibold text-lg"></p>
+        </div>
+
+        <div id="game-over-area" class="mt-6 hidden">
+            <button id="play-again-btn" class="w-full p-3 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-medium transition duration-200 ease-in-out transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-800">
+                Play Again
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const guessInput = document.getElementById('guess-input');
+        const submitGuessBtn = document.getElementById('submit-guess-btn');
+        const lastGuessValue = document.getElementById('last-guess-value');
+        const guessesRemainingValue = document.getElementById('guesses-remaining-value');
+        const messageDisplay = document.getElementById('message-display');
+        const gameOverArea = document.getElementById('game-over-area');
+        const playAgainBtn = document.getElementById('play-again-btn');
+
+        let randomNumber;
+        let guessCount = 1;
+
+        // Function to start a new game
+        function startNewGame() {
+            randomNumber = Math.floor(Math.random() * 100) + 1;
+            guessCount = 1;
+            
+            // Reset UI
+            guessInput.value = '';
+            lastGuessValue.textContent = 'None';
+            guessesRemainingValue.textContent = 10;
+            messageDisplay.textContent = '';
+            messageDisplay.className = 'font-semibold text-lg';
+            gameOverArea.classList.add('hidden');
+            guessInput.disabled = false;
+            submitGuessBtn.disabled = false;
+        }
+
+        // Function to check the user's guess
+        function checkGuess() {
+            const userGuess = Number(guessInput.value);
+
+            if (userGuess < 1 || userGuess > 100) {
+                messageDisplay.textContent = 'Please enter a number between 1 and 100.';
+                messageDisplay.className = 'font-semibold text-lg text-yellow-400';
+                return;
+            }
+
+            lastGuessValue.textContent = userGuess;
+            guessesRemainingValue.textContent = 10 - guessCount;
+
+            if (userGuess === randomNumber) {
+                messageDisplay.textContent = 'Congratulations! You got it right!';
+                messageDisplay.className = 'font-semibold text-lg text-green-400';
+                setGameOver();
+            } else if (guessCount === 10) {
+                messageDisplay.textContent = `!!!GAME OVER!!! The correct number was ${randomNumber}.`;
+                messageDisplay.className = 'font-semibold text-lg text-red-400';
+                setGameOver();
+            } else {
+                if (userGuess < randomNumber) {
+                    messageDisplay.textContent = 'Wrong! Your guess was too low.';
+                } else {
+                    messageDisplay.textContent = 'Wrong! Your guess was too high.';
+                }
+                messageDisplay.className = 'font-semibold text-lg text-yellow-400';
+            }
+
+            guessCount++;
+            guessInput.value = '';
+        }
+
+        // Function to end the game
+        function setGameOver() {
+            guessInput.disabled = true;
+            submitGuessBtn.disabled = true;
+            gameOverArea.classList.remove('hidden');
+        }
+
+        // Event listeners
+        submitGuessBtn.addEventListener('click', checkGuess);
+        guessInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                checkGuess();
+            }
+        });
+        playAgainBtn.addEventListener('click', startNewGame);
+
+        // Start the game when the page loads
+        window.onload = startNewGame;
+    </script>
+</body>
+</html>
